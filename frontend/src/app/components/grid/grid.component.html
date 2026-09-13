@@ -1,1 +1,57 @@
-<div class=\"grid-container\">\n  <div class=\"grid-header\">\n    <h1>Items Grid with CDK Virtual Scrolling</h1>\n    <input\n      type=\"text\"\n      placeholder=\"Search by name, email, phone or address...\"\n      (keyup)=\"onSearchChange($event)\"\n      class=\"search-input\"\n    />\n  </div>\n\n  <div *ngIf=\"isLoading\" class=\"loading\">Loading...</div>\n\n  <!-- Sort Options -->\n  <div class=\"sort-controls\" *ngIf=\"!isLoading\">\n    <label>Sort by:</label>\n    <button \n      *ngFor=\"let col of ['id', 'name', 'email', 'phone', 'address', 'createdAt']\"\n      class=\"sort-btn\"\n      [class.active]=\"sortBy === col\"\n      (click)=\"onSortChange(col)\">\n      {{ col | titlecase }}\n      <span *ngIf=\"sortBy === col\" class=\"sort-arrow\">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>\n    </button>\n  </div>\n\n  <!-- CDK Virtual Scrolling Table -->\n  <div class=\"virtual-scroll-container\" *ngIf=\"!isLoading && items.length > 0\">\n    <div class=\"table-header\">\n      <div class=\"header-row\">\n        <div class=\"header-cell\" style=\"width: 5%;\">ID</div>\n        <div class=\"header-cell\" style=\"width: 20%;\">Name</div>\n        <div class=\"header-cell\" style=\"width: 25%;\">Email</div>\n        <div class=\"header-cell\" style=\"width: 15%;\">Phone</div>\n        <div class=\"header-cell\" style=\"width: 20%;\">Address</div>\n        <div class=\"header-cell\" style=\"width: 15%;\">Created At</div>\n        <div class=\"header-cell\" style=\"width: 10%;\">Actions</div>\n      </div>\n    </div>\n\n    <cdk-virtual-scroll-viewport [itemSize]=\"itemHeight\" class=\"viewport\">\n      <div \n        *cdkVirtualFor=\"let item of items; trackBy: trackByIndex\"\n        class=\"row\"\n        [@.disabled]=\"true\">\n        <div class=\"cell\" style=\"width: 5%;\">{{ item.id }}</div>\n        <div class=\"cell\" style=\"width: 20%;\">{{ item.name }}</div>\n        <div class=\"cell\" style=\"width: 25%;\">{{ item.email }}</div>\n        <div class=\"cell\" style=\"width: 15%;\">{{ item.phone }}</div>\n        <div class=\"cell\" style=\"width: 20%;\">{{ item.address }}</div>\n        <div class=\"cell\" style=\"width: 15%;\">{{ item.createdAt | date: 'short' }}</div>\n        <div class=\"cell actions-cell\" style=\"width: 10%;\">\n          <button mat-icon-button color=\"primary\" (click)=\"editItem(item)\" title=\"Edit\">\n            <mat-icon>edit</mat-icon>\n          </button>\n          <button mat-icon-button color=\"warn\" (click)=\"deleteItem(item.id)\" title=\"Delete\">\n            <mat-icon>delete</mat-icon>\n          </button>\n        </div>\n      </div>\n    </cdk-virtual-scroll-viewport>\n  </div>\n\n  <!-- Empty State -->\n  <div class=\"empty-state\" *ngIf=\"!isLoading && items.length === 0\">\n    <p>No items found</p>\n  </div>\n\n  <!-- Pagination -->\n  <mat-paginator\n    [length]=\"totalItems\"\n    [pageSize]=\"pageSize\"\n    [pageSizeOptions]=\"[5, 10, 25, 50]\"\n    (page)=\"onPageChange($event)\"\n    class=\"paginator\"\n    *ngIf=\"!isLoading\">\n  </mat-paginator>\n</div>\n
+<div class="grid-container">  <div class="grid-header">    <h1> 
+Items Grid with CDK Virtual Scrolling</h1> 
+    <input      type="text"      placeholder="Search by name, email, phone or address..."      (keyup)="onSearchChange($event)"      class="search-input"    /> 
+  </div> 
+  <div *ngIf="isLoading" class="loading"> 
+Loading...</div> 
+  <!-- Sort Options --> 
+  <div class="sort-controls" *ngIf="!isLoading"> 
+    <label> 
+Sort by:</label> 
+    <button       *ngFor="let col of ['id', 'name', 'email', 'phone', 'address', 'createdAt']"      class="sort-btn"      [class.active]="sortBy === col"      (click)="onSortChange(col)"> 
+      {{ col | titlecase }}      <span *ngIf="sortBy === col" class="sort-arrow"> 
+{{ sortOrder === 'asc' ? '↑' : '↓' }}</span> 
+    </button> 
+  </div> 
+  <!-- CDK Virtual Scrolling Table --> 
+  <div class="virtual-scroll-container" *ngIf="!isLoading && items.length > 
+ 0"> 
+    <div class="table-header"> 
+      <div class="header-row"> 
+        <div class="header-cell" style="width: 5%;"> ID</div> 
+        <div class="header-cell" style="width: 20%;"> Name</div> 
+        <div class="header-cell" style="width: 25%;"> Email</div> 
+        <div class="header-cell" style="width: 15%;"> Phone</div> 
+        <div class="header-cell" style="width: 20%;"> Address</div> 
+        <div class="header-cell" style="width: 15%;"> Created At</div> 
+        <div class="header-cell" style="width: 10%;"> Actions</div> 
+      </div> 
+    </div> 
+    <cdk-virtual-scroll-viewport [itemSize]="itemHeight" class="viewport"> 
+      <div         *cdkVirtualFor="let item of items; trackBy: trackByIndex"        class="row"        [@.disabled]="true"> 
+        <div class="cell" style="width: 5%;"> {{ item.id }}</div> 
+        <div class="cell" style="width: 20%;"> {{ item.name }}</div> 
+        <div class="cell" style="width: 25%;"> {{ item.email }}</div> 
+        <div class="cell" style="width: 15%;"> {{ item.phone }}</div> 
+        <div class="cell" style="width: 20%;">{{ item.address }}</div> 
+        <div class="cell" style="width: 15%;">{{ item.createdAt | date: 'short' }}</div> 
+        <div class="cell actions-cell" style="width: 10%;"> 
+          <button mat-icon-button color="primary" (click)="editItem(item)" title="Edit"> 
+            <mat-icon> edit</mat-icon> 
+          </button> 
+          <button mat-icon-button color="warn" (click)="deleteItem(item.id)" title="Delete"> 
+            <mat-icon> delete</mat-icon> 
+          </button> 
+        </div> 
+      </div> 
+    </cdk-virtual-scroll-viewport> 
+  </div> 
+  <!-- Empty State --> 
+  <div class="empty-state" *ngIf="!isLoading && items.length === 0"> 
+    <p> 
+No items found</p> 
+  </div> 
+  <!-- Pagination --> 
+  <mat-paginator    [length]="totalItems"    [pageSize]="pageSize"    [pageSizeOptions]="[5, 10, 25, 50]"    (page)="onPageChange($event)"    class="paginator"    *ngIf="!isLoading"> 
+  </mat-paginator> 
+</div> 
