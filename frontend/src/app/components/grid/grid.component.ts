@@ -1,1 +1,51 @@
-import { Component, OnInit, ViewChild } from '@angular/core';\nimport { CommonModule } from '@angular/common';\nimport { FormsModule } from '@angular/forms';\nimport { HttpClientModule } from '@angular/common/http';\nimport { ScrollingModule, CdkVirtualScrollViewport } from '@angular/cdk/scrolling';\nimport { MatPaginatorModule, PageEvent } from '@angular/material/paginator';\nimport { MatInputModule } from '@angular/material/input';\nimport { MatButtonModule } from '@angular/material/button';\nimport { MatIconModule } from '@angular/material/icon';\nimport { MatDialogModule } from '@angular/material/dialog';\nimport { MatFormFieldModule } from '@angular/material/form-field';\nimport { debounceTime, Subject } from 'rxjs';\n\nimport { ItemService } from '../../services/item.service';\nimport { Item, GridResponse } from '../../models/item.model';\nimport { EditDialogComponent } from '../edit-dialog/edit-dialog.component';\nimport { MatDialog } from '@angular/material/dialog';\n\n@Component({\n  selector: 'app-grid',\n  standalone: true,\n  imports: [\n    CommonModule,\n    FormsModule,\n    HttpClientModule,\n    ScrollingModule,\n    MatPaginatorModule,\n    MatInputModule,\n    MatButtonModule,\n    MatIconModule,\n    MatDialogModule,\n    MatFormFieldModule\n  ],\n  templateUrl: './grid.component.html',\n  styleUrls: ['./grid.component.css']\n})\nexport class GridComponent implements OnInit {\n  @ViewChild(CdkVirtualScrollViewport) viewport?: CdkVirtualScrollViewport;\n\n  items: Item[] = [];\n  totalItems: number = 0;\n  pageSize: number = 10;\n  currentPage: number = 0;\n  sortBy: string = 'id';\n  sortOrder: string = 'asc';\n  searchText: string = '';\n  isLoading: boolean = false;\n  itemHeight: number = 60; // Height of each row in pixels\n\n  private searchSubject = new Subject<string>();\n\n  constructor(\n    private itemService: ItemService,\n    private dialog: MatDialog\n  ) {\n    // Setup debounced search\n    this.searchSubject.pipe(\n      debounceTime(300)\n    ).subscribe(searchText => {\n      this.searchText = searchText;\n      this.currentPage = 0;\n      this.loadItems();\n    });\n  }\n\n  ngOnInit(): void {\n    this.loadItems();\n  }\n\n  loadItems(): void {\n    this.isLoading = true;\n    this.itemService.getItems(\n      this.currentPage + 1,\n      this.pageSize,\n      this.sortBy,\n      this.sortOrder,\n      this.searchText\n    ).subscribe({\n      next: (response: GridResponse) => {\n        this.items = response.items;\n        this.totalItems = response.totalCount;\n        this.isLoading = false;\n      },\n      error: (error) => {\n        console.error('Error loading items:', error);\n        this.isLoading = false;\n      }\n    });\n  }\n\n  onSearchChange(event: any): void {\n    this.searchSubject.next(event.target.value);\n  }\n\n  onPageChange(event: PageEvent): void {\n    this.currentPage = event.pageIndex;\n    this.pageSize = event.pageSize;\n    this.loadItems();\n  }\n\n  onSortChange(sortBy: string): void {\n    if (this.sortBy === sortBy) {\n      // Toggle sort order if clicking the same column\n      this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';\n    } else {\n      this.sortBy = sortBy;\n      this.sortOrder = 'asc';\n    }\n    this.currentPage = 0;\n    this.loadItems();\n  }\n\n  editItem(item: Item): void {\n    const dialogRef = this.dialog.open(EditDialogComponent, {\n      width: '400px',\n      data: { item: { ...item } }\n    });\n\n    dialogRef.afterClosed().subscribe(result => {\n      if (result) {\n        this.itemService.updateItem(item.id, result).subscribe({\n          next: () => {\n            this.loadItems();\n          },\n          error: (error) => console.error('Error updating item:', error)\n        });\n      }\n    });\n  }\n\n  deleteItem(id: number): void {\n    if (confirm('Are you sure you want to delete this item?')) {\n      this.itemService.deleteItem(id).subscribe({\n        next: () => {\n          this.loadItems();\n        },\n        error: (error) => console.error('Error deleting item:', error)\n      });\n    }\n  }\n\n  trackByIndex(index: number, item: Item): number {\n    return item.id;\n  }\n}\n
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { GridService } from '../../services/grid.service'; // Hypothetical backend service path
+import { GridItem } from '../../models/grid-item.model';
+
+@Component({
+  selector: 'app-grid',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './grid.component.html',
+  styleUrls: ['./grid.component.scss']
+})
+export class GridComponent implements OnInit {
+  private gridService = inject(GridService);
+
+  // Use Signals to manage grid state natively
+  gridData = signal<GridItem[]>([]);
+  isLoading = signal<boolean>(false);
+  searchTerm = signal<string>('');
+
+  // Derived state updates automatically when dependencies change
+  filteredData = computed(() => {
+    const term = this.searchTerm().toLowerCase();
+    if (!term) return this.gridData();
+    return this.gridData().filter(item => 
+      item.name.toLowerCase().includes(term)
+    );
+  });
+
+  ngOnInit(): void {
+    this.loadGridData();
+  }
+
+  loadGridData(): void {
+    this.isLoading.set(true);
+    this.gridService.getItems().subscribe({
+      next: (data) => {
+        this.gridData.set(data);
+        this.isLoading.set(false);
+      },
+      error: () => this.isLoading.set(false)
+    });
+  }
+
+  deleteItem(id: number): void {
+    this.gridService.deleteItem(id).subscribe(() => {
+      // Functional state mutation via .update()
+      this.gridData.update(items => items.filter(item => item.id !== id));
+    });
+  }
+}
