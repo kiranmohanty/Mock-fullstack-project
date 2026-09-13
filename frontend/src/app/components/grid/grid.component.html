@@ -1,0 +1,38 @@
+<div class="grid-container">
+  <div class="grid-header">
+    <h1>Items Grid with CDK Virtual Scrolling</h1>
+    <input
+      type="text"
+      placeholder="Search by name, email, phone..."
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchChange($event)"
+      class="search-input"
+    />
+  </div>
+
+  <div *ngIf="filteredData.length === 0" class="no-data-message">
+    No items found matching your search.
+  </div>
+
+  <cdk-virtual-scroll-viewport
+    *ngIf="filteredData.length > 0"
+    [itemSize]="itemHeight"
+    class="grid-viewport"
+  >
+    <div *cdkVirtualFor="let row of gridRows; trackBy: trackByRowId">
+      <div class="grid-row">
+        <div
+          *ngFor="let item of row; trackBy: trackByItemId"
+          class="grid-item"
+        >
+          <div class="item-card">
+            <div class="item-id">ID: {{ item.id }}</div>
+            <div class="item-name">{{ item.name }}</div>
+            <div class="item-email">{{ item.email }}</div>
+            <div class="item-phone">{{ item.phone }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </cdk-virtual-scroll-viewport>
+</div>
