@@ -1,0 +1,150 @@
+.grid-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.grid-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 20px;
+}
+
+.grid-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 500;
+  color: #333;
+}
+
+.search-input {
+  flex: 1;
+  max-width: 400px;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 4px rgba(25, 118, 210, 0.1);
+}
+
+.grid-viewport {
+  height: 600px;
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #fafafa;
+}
+
+.grid-row {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  height: 120px;
+}
+
+.grid-item {
+  flex: 1 1 calc(20% - 10px);
+  min-width: 200px;
+}
+
+.item-card {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  height: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s, transform 0.2s;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.item-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.item-id {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.item-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-email {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-phone {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.no-data-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 16px;
+  color: #999;
+  background-color: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+@media (max-width: 1200px) {
+  .grid-row {
+    flex-wrap: wrap;
+  }
+
+  .grid-item {
+    flex: 1 1 calc(25% - 10px);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input {
+    max-width: 100%;
+  }
+
+  .grid-item {
+    flex: 1 1 calc(50% - 10px);
+    min-width: 150px;
+  }
+
+  .grid-container {
+    padding: 10px;
+  }
+}
